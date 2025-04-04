@@ -7,6 +7,7 @@ module.exports = {
     entry: {
       options: path.join(srcDir, 'options.tsx'),
       background: path.join(srcDir, 'background.ts'),
+      offscreen: path.join(srcDir, 'offscreen.ts'),
       "plugin-discovery": path.join(srcDir, 'plugin-discovery.ts'),
       "isolation-bridge": path.join(srcDir, 'isolation-bridge.ts'),
       "xhrpatch": path.join(srcDir, 'xhrpatch.js'),
@@ -14,6 +15,7 @@ module.exports = {
     output: {
         path: path.join(__dirname, "../dist/js"),
         filename: "[name].js",
+        webassemblyModuleFilename: "static/wasm/[hash].wasm",
     },
     optimization: {
         splitChunks: {
@@ -30,10 +32,18 @@ module.exports = {
                 use: "ts-loader",
                 exclude: /node_modules/,
             },
+            {
+                test: /.*\.wasm$/,
+                type: "asset/resource",
+                generator: {
+                  filename: "static/wasm/[name].[contenthash][ext]",
+                },
+              },
         ],
+        
     },
     resolve: {
-        extensions: [".ts", ".tsx", ".js"],
+        extensions: [".ts", ".tsx", ".js", ".wasm"],
     },
     plugins: [
         new CopyPlugin({
@@ -41,4 +51,7 @@ module.exports = {
             options: {},
         }),
     ],
+    experiments: {
+        asyncWebAssembly: true,
+      },
 };

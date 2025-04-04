@@ -6,8 +6,8 @@ window.addEventListener("message", function (message) {
   // service worker might not be available, but that is
   // typically only when dealing with reloads of the plugin
   // leading to noise
-  if (message.data.type) {
+  if (message.data.type && !message.data.target) {
     console.debug("Forwarding message of type", message.data.type);
-    if (chrome.runtime?.id) chrome.runtime.sendMessage({ ...message.data });
+    if (chrome.runtime?.id) chrome.runtime.sendMessage({target: "background", ...message.data });
   }
 });

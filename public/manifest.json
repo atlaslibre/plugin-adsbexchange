@@ -17,8 +17,12 @@
   },
   "permissions": [
     "storage",
-    "scripting"
+    "scripting",
+    "offscreen"
   ],
+  "content_security_policy": {
+    "extension_pages": "worker-src 'self'; script-src 'self' 'wasm-unsafe-eval'"
+  },
   "host_permissions": ["https://globe.adsbexchange.com/*"],
   "externally_connectable": {
     "matches": [

@@ -116,6 +116,7 @@
             hex: hex,
             lat: lat,
             lon: lon,
+            speed: gs,
             alt: alt,
           });
         }
