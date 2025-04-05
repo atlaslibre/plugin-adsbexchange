@@ -1,69 +1,41 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { executeQuery } from "./features/db-interface";
 
 const Options = () => {
-  const [color, setColor] = useState<string>("");
-  const [status, setStatus] = useState<string>("");
-  const [like, setLike] = useState<boolean>(false);
+  const [positionCounts, setPositionCounts] = useState(-1);
+  const [dataCounts, setDataCounts] = useState(-1);
 
-  useEffect(() => {
-    // Restores select box and checkbox state using the preferences
-    // stored in chrome.storage.
-    chrome.storage.sync.get(
-      {
-        favoriteColor: "red",
-        likesColor: true,
-      },
-      (items) => {
-        setColor(items.favoriteColor);
-        setLike(items.likesColor);
-      }
+  const updateCounts = () => {
+    executeQuery<any[]>("SELECT COUNT(*) as c FROM aircraft_positions").then(
+      (result) => setDataCounts(result[0].c)
     );
-  }, []);
 
-  const saveOptions = () => {
-    // Saves options to chrome.storage.sync.
-    chrome.storage.sync.set(
-      {
-        favoriteColor: color,
-        likesColor: like,
-      },
-      () => {
-        // Update status to let user know options were saved.
-        setStatus("Options saved.");
-        const id = setTimeout(() => {
-          setStatus("");
-        }, 1000);
-        return () => clearTimeout(id);
-      }
+    executeQuery<any[]>("SELECT COUNT(*) as c FROM aircraft_data").then(
+      (result) => setPositionCounts(result[0].c)
     );
   };
 
+  const clearDb = () => {
+    executeQuery<any[]>("DELETE FROM aircraft_positions").then(() =>
+      executeQuery<any[]>("DELETE FROM aircraft_data").then(() => {
+        updateCounts();
+      })
+    );
+  };
+
+  useEffect(() => updateCounts());
+
   return (
     <>
-      <div>
-        Favorite color: <select
-          value={color}
-          onChange={(event) => setColor(event.target.value)}
-        >
-          <option value="red">red</option>
-          <option value="green">green</option>
-          <option value="blue">blue</option>
-          <option value="yellow">yellow</option>
-        </select>
-      </div>
-      <div>
-        <label>
-          <input
-            type="checkbox"
-            checked={like}
-            onChange={(event) => setLike(event.target.checked)}
-          />
-          I like colors.
-        </label>
-      </div>
-      <div>{status}</div>
-      <button onClick={saveOptions}>Save</button>
+      <dl>
+        <dt>Known aircraft positions</dt>
+        <dd>{positionCounts}</dd>
+
+        <dt>Known aircraft data updates</dt>
+        <dd>{dataCounts}</dd>
+      </dl>
+      <button onClick={updateCounts}>Update</button> <button onClick={clearDb}>Clear DB</button>
     </>
   );
 };
