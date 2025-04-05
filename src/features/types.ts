@@ -10,7 +10,14 @@ interface StorePositionFramesMessage {
   frames: PositionFrame[];
 }
 
+interface QueryMessage {
+  type: "query";
+  target: "db";
+  query: string;
+}
+
 export type DbInterfaceMessage =
+  | QueryMessage
   | StoreDataFramesMessage
   | StorePositionFramesMessage;
 

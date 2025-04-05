@@ -1,5 +1,6 @@
-import { initDb, insertDataFrames, insertPositionFrames } from "./db/commands";
+import { bulkInsert, runQuery } from "./db/commands";
 import { getDbInstance } from "./db/duckdb-setup";
+import { initDb } from "./db/migrations";
 import { DbInterfaceMessage } from "./features/types";
 
 const db = await getDbInstance();
@@ -13,24 +14,28 @@ console.log(`DuckDB ready version: ${version}`);
 await initDb(db);
 
 chrome.runtime.onMessage.addListener(
-  (msg: DbInterfaceMessage, _sender, _sendResponse) => {
+  (msg: DbInterfaceMessage, _sender, sendResponse) => {
     if (msg.target !== "db") return;
 
     (async () => {
-      const conn = await db.connect();
-
-      console.log("Got DB request of type", msg.type, msg);
+      console.log("Processing database request", msg.type);
 
       if (msg.type === "store-data-frames") {
-        await insertDataFrames(msg.frames, conn);
+        await bulkInsert(db, "aircraft_data", msg.frames);
+        return;
       }
 
       if (msg.type === "store-position-frames") {
-        await insertPositionFrames(msg.frames, conn);
+        await bulkInsert(db, "aircraft_positions", msg.frames);
+        return;
       }
 
-      await conn.close();
+      if (msg.type === "query") {
+        const response = await runQuery(db, msg.query);
+        sendResponse(response);
+      }
     })();
+
     return !msg.type.startsWith("store-");
   }
 );

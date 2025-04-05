@@ -73,6 +73,7 @@
               ts: timestamp,
               hex: hex,
               squawk: squawk,
+              reg: null,
             };
 
             if (replay.pointsU8[4 * (i + 2)] != 0) {
@@ -118,6 +119,7 @@
             lon: lon,
             speed: gs,
             alt: alt,
+            heading: null
           });
         }
       }

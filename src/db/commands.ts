@@ -1,83 +1,53 @@
-import { AsyncDuckDB, AsyncDuckDBConnection } from "@duckdb/duckdb-wasm";
-import { DataFrame, PositionFrame } from "../features/types";
+import { AsyncDuckDB } from "@duckdb/duckdb-wasm";
+import { randToken } from "../shared/utilities";
 
-export const DataFrameCreateCommand = `
-    CREATE TABLE IF NOT EXISTS aircraft_data (
-        ts UBIGINT, 
-        hex VARCHAR NOT NULL,
-        squawk VARCHAR,
-        flight VARCHAR,
-        reg VARCHAR,
-        PRIMARY KEY (ts, hex)
-    );`;
+export const bulkInsert = async <T>(
+  db: AsyncDuckDB,
+  table: string,
+  rows: T[]
+) => {
+  const now = Date.now();
+  const filename = `import-${randToken()}.json`;
 
-export const PositionFrameCreateCommand = `
-    CREATE TABLE IF NOT EXISTS aircraft_positions (
-        ts UBIGINT, 
-        hex VARCHAR NOT NULL,
-        lat FLOAT NOT NULL,
-        lon FLOAT NOT NULL,
-        alt FLOAT NOT NULL,
-        speed SMALLINT,
-        heading SMALLINT,
-        PRIMARY KEY (ts, hex)
-    );`;
+  await db.registerFileText(filename, JSON.stringify(rows));
 
-export const initDb = async (db: AsyncDuckDB) => {
   const conn = await db.connect();
-  await conn.query(DataFrameCreateCommand);
-  await conn.query(PositionFrameCreateCommand);
+
+  await conn.query(
+    `INSERT INTO '${table}' SELECT * FROM read_json('${filename}', records=true, format = 'array') ON CONFLICT DO NOTHING;`
+  );
+
   await conn.close();
+  await db.dropFile(filename);
+
+  const timing = Date.now() - now;
+  console.log(
+    `bulk insert complete for table ${table} in ${timing} ms (${rows.length} records)`
+  );
 };
 
-export const insertDataFrames = async (
-  frames: DataFrame[],
-  conn: AsyncDuckDBConnection
-) => {
-  const now = Date.now();
-  await conn.query("BEGIN TRANSACTION;");
-  const stmt = await conn.prepare(`
-        INSERT INTO aircraft_data VALUES (?,?,?,?,?) ON CONFLICT DO NOTHING;
-    `);
-  for (let i = 0; i < frames.length; i++) {
-    const frame = frames[i];
-    await stmt.query(
-      frame.ts,
-      frame.hex,
-      frame.squawk,
-      frame.flight,
-      frame.reg
-    );
-  }
-  await stmt.close();
-  await conn.query("COMMIT;");
-  console.log("insertDataFrame complete", Date.now() - now);
-};
-
-export const insertPositionFrames = async (
-  frames: PositionFrame[],
-  conn: AsyncDuckDBConnection
-) => {
+export const runQuery = async (db: AsyncDuckDB, query: string) => {
   const now = Date.now();
 
-  await conn.query("BEGIN TRANSACTION;");
-  const stmt = await conn.prepare(`
-        INSERT INTO aircraft_positions VALUES (?,?,?,?,?,?,?) ON CONFLICT DO NOTHING;
-    `);
+  const conn = await db.connect();
+  const result = await conn.query(query);
+  const returnValue = result.toArray().map((row) => row.toJSON());
+  
+  const safeReturnValue = JSON.parse(
+    JSON.stringify(returnValue, (key, value) => {
+      if (typeof value === "bigint")
+        //@ts-ignore
+        return JSON.rawJSON(value.toString());
 
-  for (let i = 0; i < frames.length; i++) {
-    const frame = frames[i];
-    await stmt.query(
-      frame.ts,
-      frame.hex,
-      frame.lat,
-      frame.lon,
-      frame.alt,
-      frame.speed,
-      frame.heading
-    );
-  }
-  await stmt.close();
-  await conn.query("COMMIT;");
-  console.log("insertDataFrame complete", Date.now() - now);
+      return value;
+    })
+  );
+    
+  const timing = Date.now() - now;
+  
+  console.log(
+    `query complete '${query}' in ${timing} ms (${returnValue.length} records)`
+  );
+
+  return safeReturnValue;
 };

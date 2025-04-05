@@ -12,6 +12,7 @@
     "48": "icons/logo48.png",
     "128": "icons/logo128.png"
   },
+  "action": {},
   "background": {
     "service_worker": "js/background.js"
   },
