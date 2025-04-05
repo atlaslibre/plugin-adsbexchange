@@ -9,7 +9,6 @@ await setupOffscreenDocument("offscreen.html");
 
 let captureActive = true;
 
-
 chrome.runtime.onMessageExternal.addListener(function (msg) {
   if (msg.type === "locate") locate(msg.center[1], msg.center[0], msg.zoom);
 });
