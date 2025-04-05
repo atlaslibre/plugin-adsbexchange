@@ -35,7 +35,7 @@ setInterval(async () => {
   const result = await executeQuery<any[]>(
     "SELECT COUNT(*) as c FROM aircraft_positions"
   );
-  console.log(result[0].c);
+  console.log("known positions", result[0].c);
 }, 5000);
 
 updateIcon(captureActive);

@@ -13,6 +13,74 @@
     window.postMessage({ type: "live", data: data.aircraft });
   };
 
+  const traceHandler = (url, response) => {
+    const o = JSON.parse(response);
+    const hex = o.icao;
+    const baseTimestamp = o.timestamp;
+
+    let positionUpdates = [];
+    let dataUpdates = [];
+
+    let lastSquawk = undefined;
+    let lastFlight = undefined;
+
+    for (let i = 0; i < o.trace.length; i++) {
+      const t = o.trace[i];
+
+      const timestamp = Math.trunc((t[0] + baseTimestamp) * 1000);
+
+      const lat = t[1];
+      const lon = t[2];
+
+      if (lat && lon)
+        positionUpdates.push({
+          ts: timestamp,
+          hex: hex,
+          lat: lat,
+          lon: lon,
+          speed: t[4],
+          alt: t[3],
+          heading: null,
+        });
+
+      const squawk = t[8]?.squawk;
+      const flight = t[8]?.flight;
+
+      if (t[8] && (flight !== lastFlight || squawk !== lastSquawk)) {
+        dataUpdates.push({
+          ts: timestamp,
+          hex: hex,
+          squawk: squawk,
+          flight: flight,
+          reg: o.r,
+        });
+
+        lastSquawk = squawk;
+        lastFlight = flight;
+      }
+    }
+
+    positionUpdates = dedupArray(positionUpdates);
+    dataUpdates = dedupArray(dataUpdates);
+
+    window.postMessage({
+      type: "replay-data",
+      key: url,
+      data: dataUpdates,
+    });
+
+    window.postMessage({
+      type: "replay-pos",
+      key: url,
+      positions: positionUpdates,
+    });
+
+    window.postMessage({
+      type: "replay-complete",
+      key: url,
+    });
+  };
+
   const replayRegex =
     /globe_history\/(?<year>\d{4})\/(?<month>\d{2})\/(?<day>\d{2})\/heatmap\/(?<chunk>\d{2})\.bin\.ttf$/;
 
@@ -119,7 +187,7 @@
             lon: lon,
             speed: gs,
             alt: alt,
-            heading: null
+            heading: null,
           });
         }
       }
@@ -170,6 +238,17 @@
         )
       ) {
         liveHandler(this.response);
+      }
+
+      if (
+        this.responseURL.startsWith(
+          "https://globe.adsbexchange.com/globe_history/"
+        ) ||
+        this.responseURL.startsWith(
+          "https://globe.adsbexchange.com/data/traces/"
+        )
+      ) {
+        traceHandler(this.responseURL, this.response);
       }
     });
     return originalXhr.apply(this, arguments);
