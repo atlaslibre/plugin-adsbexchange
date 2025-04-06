@@ -9,8 +9,24 @@ await setupOffscreenDocument("offscreen.html");
 
 let captureActive = true;
 
-chrome.runtime.onMessageExternal.addListener(function (msg) {
+chrome.runtime.onMessageExternal.addListener(function (
+  msg,
+  _sender,
+  sendResponse
+) {
   if (msg.type === "locate") locate(msg.center[1], msg.center[0], msg.zoom);
+  if (msg.type === "status") {
+    if (!captureActive) {
+      sendResponse("Capture disabled");
+      return;
+    }
+
+    executeQuery<any[]>(
+      "SELECT COUNT(DISTINCT hex) as c FROM aircraft_positions"
+    ).then((r) => {
+      sendResponse(`${r[0].c} aircraft discovered`);
+    });
+  }
 });
 
 chrome.runtime.onMessage.addListener(function (msg) {
@@ -30,12 +46,5 @@ chrome.action.onClicked.addListener(() => {
   captureActive = !captureActive;
   updateIcon(captureActive);
 });
-
-setInterval(async () => {
-  const result = await executeQuery<any[]>(
-    "SELECT COUNT(*) as c FROM aircraft_positions"
-  );
-  console.log("known positions", result[0].c);
-}, 5000);
 
 updateIcon(captureActive);

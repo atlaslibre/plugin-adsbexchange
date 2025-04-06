@@ -4,5 +4,6 @@ registerPlugin({
   type: "actor",
   name: "ADSB Exchange",
   replay: true,
-  locate: true
+  locate: true,
+  status: true
 })

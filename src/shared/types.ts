@@ -3,4 +3,5 @@ export interface PluginDescriptor {
     name: string;
     replay: boolean;
     locate: boolean;
+    status: boolean;
   }
