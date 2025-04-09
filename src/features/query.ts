@@ -87,10 +87,10 @@ FROM
     ) as aircraft_data ON aircraft_positions.hex = aircraft_data.hex
 WHERE
     delta < ${delta} AND
-    lat > ${latmin} AND
-    lat < ${latmax} AND
-    lon > ${lonmin} AND
-    lon < ${lonmax}
+    lat > ${latmin-2} AND
+    lat < ${latmax+2} AND
+    lon > ${lonmin-2} AND
+    lon < ${lonmax+2}
 ORDER BY
     delta
 LIMIT ${limit}`;
