@@ -51,13 +51,18 @@ chrome.runtime.onMessageExternal.addListener(function (
         msg.limit
       )
     ).then((positionResult) => {
-      if(msg.tracks === undefined)
-        msg.tracks = [];
+      if (msg.tracks === undefined) msg.tracks = [];
+
       const hexs = msg.tracks.map((s: string): string => s.split("-")[1]);
 
-      executeQuery<TrackQueryRow[]>(
-        generateTrackQuery(hexs, msg.ts * 1000, msg.maxDelta)
-      ).then((trackResult) => {
+      const trackPromise =
+        hexs.length > 0
+          ? executeQuery<TrackQueryRow[]>(
+              generateTrackQuery(hexs, msg.ts * 1000, msg.maxDeltaTrack ?? msg.maxDelta)
+            )
+          : Promise.resolve([]);
+
+      trackPromise.then((trackResult) => {
         const tracks = [];
         for (let i = 0; i < msg.tracks.length; i++) {
           const hex = msg.tracks[i].split("-")[1] as string;

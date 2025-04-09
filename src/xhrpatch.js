@@ -39,7 +39,7 @@
           lat: lat,
           lon: lon,
           speed: t[4],
-          alt: t[3],
+          alt: t[3] === "ground" ? 0 : t[3],
           heading: null,
         });
 

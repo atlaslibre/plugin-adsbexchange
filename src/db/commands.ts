@@ -14,7 +14,7 @@ export const bulkInsert = async <T>(
   const conn = await db.connect();
 
   await conn.query(
-    `INSERT INTO '${table}' SELECT * FROM read_json('${filename}', records=true, format = 'array') ON CONFLICT DO NOTHING;`
+    `INSERT OR IGNORE INTO '${table}' SELECT * FROM read_json('${filename}', records=true, format = 'array');`
   );
 
   await conn.close();
