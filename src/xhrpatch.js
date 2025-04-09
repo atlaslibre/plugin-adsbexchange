@@ -120,7 +120,7 @@
 
         // read out header
         let timestamp =
-          replay.pointsU[i + 2] / 1000 + replay.pointsU[i + 1] * 4294967.296;
+          replay.pointsU[i + 2] + replay.pointsU[i + 1] * 4294967296;
 
         // read out body
         i += 4;

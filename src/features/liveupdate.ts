@@ -6,14 +6,14 @@ let lastLiveUpdate = 0;
 
 export const handleLiveUpdate = (msg: any) => {
   const now = Date.now();
-  if (now - lastLiveUpdate < 10000) return;
+  if (now - lastLiveUpdate < 3000) return;
 
   const dataFrames: DataFrame[] = [];
   const positionFrames: PositionFrame[] = [];
 
   for (let i = 0; i < msg.data.length; i++) {
     const frame = msg.data[i] as LiveAircraft;
-
+    
     if (frame.lat === undefined || frame.lon === undefined) continue;
     if (frame.type === "adsb_icao_nt" && frame.alt_baro == "ground") continue;
 

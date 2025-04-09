@@ -18,8 +18,6 @@ chrome.runtime.onMessage.addListener(
     if (msg.target !== "db") return;
 
     (async () => {
-      console.log("Processing database request", msg.type);
-
       if (msg.type === "store-data-frames") {
         await bulkInsert(db, "aircraft_data", msg.frames);
         return;

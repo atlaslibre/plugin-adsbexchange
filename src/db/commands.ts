@@ -21,13 +21,17 @@ export const bulkInsert = async <T>(
   await db.dropFile(filename);
 
   const timing = Date.now() - now;
-  console.log(
+  console.debug(
     `bulk insert complete for table ${table} in ${timing} ms (${rows.length} records)`
   );
 };
 
 export const runQuery = async (db: AsyncDuckDB, query: string) => {
   const now = Date.now();
+
+  console.debug(
+    `query starting '${query}'`
+  );
 
   const conn = await db.connect();
   const result = await conn.query(query);
@@ -45,8 +49,8 @@ export const runQuery = async (db: AsyncDuckDB, query: string) => {
     
   const timing = Date.now() - now;
   
-  console.log(
-    `query complete '${query}' in ${timing} ms (${returnValue.length} records)`
+  console.debug(
+    `query complete in ${timing} ms (${returnValue.length} records)`
   );
 
   return safeReturnValue;
