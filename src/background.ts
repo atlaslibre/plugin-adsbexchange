@@ -58,7 +58,11 @@ chrome.runtime.onMessageExternal.addListener(function (
       const trackPromise =
         hexs.length > 0
           ? executeQuery<TrackQueryRow[]>(
-              generateTrackQuery(hexs, msg.ts * 1000, msg.maxDeltaTrack ?? msg.maxDelta)
+              generateTrackQuery(
+                hexs,
+                msg.ts * 1000,
+                msg.maxDeltaTrack ?? msg.maxDelta
+              )
             )
           : Promise.resolve([]);
 
@@ -66,10 +70,10 @@ chrome.runtime.onMessageExternal.addListener(function (
         const tracks = [];
         for (let i = 0; i < msg.tracks.length; i++) {
           const hex = msg.tracks[i].split("-")[1] as string;
-          const track = transformToTrack(
-            trackResult.filter((a) => a.hex == hex)
-          );
-          tracks.push(track);
+          const tracksForHex = trackResult.filter((a) => a.hex == hex);
+          if (tracksForHex.length > 0) {
+            tracks.push(transformToTrack(tracksForHex));
+          }
         }
         sendResponse({
           version: 1,
