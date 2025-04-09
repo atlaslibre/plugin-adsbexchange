@@ -8,6 +8,11 @@ import {
   transformToActor,
 } from "./features/query";
 import { handleReplayUpdate } from "./features/replayupdate";
+import {
+  generateTrackQuery,
+  TrackQueryRow,
+  transformToTrack,
+} from "./features/track";
 import { updateIcon } from "./shared/utilities";
 
 await setupOffscreenDocument("offscreen.html");
@@ -45,10 +50,27 @@ chrome.runtime.onMessageExternal.addListener(function (
         msg.bounds[1][0],
         msg.limit
       )
-    ).then((r) => {
-      sendResponse({
-        version: 1,
-        actors: r.map((a) => transformToActor(a)),
+    ).then((positionResult) => {
+      if(msg.tracks === undefined)
+        msg.tracks = [];
+      const hexs = msg.tracks.map((s: string): string => s.split("-")[1]);
+
+      executeQuery<TrackQueryRow[]>(
+        generateTrackQuery(hexs, msg.ts * 1000, msg.maxDelta)
+      ).then((trackResult) => {
+        const tracks = [];
+        for (let i = 0; i < msg.tracks.length; i++) {
+          const hex = msg.tracks[i].split("-")[1] as string;
+          const track = transformToTrack(
+            trackResult.filter((a) => a.hex == hex)
+          );
+          tracks.push(track);
+        }
+        sendResponse({
+          version: 1,
+          actors: positionResult.map((a) => transformToActor(a)),
+          tracks: tracks,
+        });
       });
     });
   }

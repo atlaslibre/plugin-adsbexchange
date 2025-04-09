@@ -1,3 +1,5 @@
+import { ActorPosition } from "../shared/types";
+
 export interface PositionQueryRow {
   hex: string;
   lat: number;
@@ -17,14 +19,7 @@ interface AircraftActor {
   type: "aircraft";
   id: string;
   name: string;
-  pos: {
-    ts: number;
-    lat: number;
-    lon: number;
-    alt?: number;
-    heading?: number;
-    speed?: number;
-  };
+  pos: ActorPosition;
   hex: string;
   reg?: string;
   flight?: string;
