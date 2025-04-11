@@ -31,6 +31,8 @@
 
       const lat = t[1];
       const lon = t[2];
+      const speed = t[4] ?? null;
+      const alt = t[3] === "ground" ? 0 : t[3] ?? null;
 
       if (lat && lon)
         positionUpdates.push({
@@ -38,8 +40,8 @@
           hex: hex,
           lat: lat,
           lon: lon,
-          speed: t[4] ?? null,
-          alt: t[3] === "ground" ? 0 : t[3] ?? null,
+          alt: alt,
+          speed: speed,
           heading: null,
           source: "trace",
         });
