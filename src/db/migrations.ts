@@ -1,4 +1,4 @@
-import { AsyncDuckDB } from "@duckdb/duckdb-wasm";
+import { AsyncDuckDB, DuckDBAccessMode } from "@duckdb/duckdb-wasm";
 
 export const DataFrameCreateCommand = `
     CREATE TABLE IF NOT EXISTS aircraft_data (
@@ -7,6 +7,7 @@ export const DataFrameCreateCommand = `
         squawk VARCHAR,
         flight VARCHAR,
         reg VARCHAR,
+        source VARCHAR,
         PRIMARY KEY (ts, hex)
     );`;
 
@@ -19,10 +20,15 @@ export const PositionFrameCreateCommand = `
         alt FLOAT,
         speed INT,
         heading INT,
+        source VARCHAR,
         PRIMARY KEY (ts, hex)
     );`;
 
 export const initDb = async (db: AsyncDuckDB) => {
+  await db.open({
+    path: "opfs://aircraft.db",
+    accessMode: DuckDBAccessMode.READ_WRITE,
+  });
   const conn = await db.connect();
   await conn.query(DataFrameCreateCommand);
   await conn.query(PositionFrameCreateCommand);

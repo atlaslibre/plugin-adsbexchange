@@ -27,6 +27,7 @@ export interface DataFrame {
   squawk: string;
   flight?: string;
   reg?: string;
+  source: string;
 }
 
 export interface PositionFrame {
@@ -37,4 +38,5 @@ export interface PositionFrame {
   alt: number;
   speed?: number;
   heading?: number;
+  source: string;
 }

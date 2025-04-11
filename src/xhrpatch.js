@@ -41,6 +41,7 @@
           speed: t[4],
           alt: t[3] === "ground" ? 0 : t[3],
           heading: null,
+          source: "trace",
         });
 
       const squawk = t[8]?.squawk;
@@ -53,6 +54,7 @@
           squawk: squawk,
           flight: flight,
           reg: o.r,
+          source: "trace",
         });
 
         lastSquawk = squawk;
@@ -142,6 +144,7 @@
               hex: hex,
               squawk: squawk,
               reg: null,
+              source: "heatmap",
             };
 
             if (replay.pointsU8[4 * (i + 2)] != 0) {
@@ -188,6 +191,7 @@
             speed: gs,
             alt: alt,
             heading: null,
+            source: "heatmap",
           });
         }
       }

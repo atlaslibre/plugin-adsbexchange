@@ -27,6 +27,7 @@ export const handleLiveUpdate = (msg: any) => {
       squawk: frame.squawk,
       flight: frame.flight,
       reg: frame.r,
+      source: "live",
     });
 
     positionFrames.push({
@@ -37,6 +38,7 @@ export const handleLiveUpdate = (msg: any) => {
       alt: altitude,
       speed: frame.gs,
       heading: frame.true_heading ?? frame.track,
+      source: "live",
     });
   }
 
