@@ -21,8 +21,8 @@
     let positionUpdates = [];
     let dataUpdates = [];
 
-    let lastSquawk = undefined;
-    let lastFlight = undefined;
+    let lastSquawk = null;
+    let lastFlight = null;
 
     for (let i = 0; i < o.trace.length; i++) {
       const t = o.trace[i];
@@ -38,8 +38,8 @@
           hex: hex,
           lat: lat,
           lon: lon,
-          speed: t[4],
-          alt: t[3] === "ground" ? 0 : t[3],
+          speed: t[4] ?? null,
+          alt: t[3] === "ground" ? 0 : t[3] ?? null,
           heading: null,
           source: "trace",
         });
@@ -51,9 +51,9 @@
         dataUpdates.push({
           ts: timestamp,
           hex: hex,
-          squawk: squawk,
-          flight: flight,
-          reg: o.r,
+          squawk: squawk ?? null,
+          flight: flight ?? null,
+          reg: o.r ?? null,
           source: "trace",
         });
 
@@ -144,6 +144,7 @@
               hex: hex,
               squawk: squawk,
               reg: null,
+              flight: null,
               source: "heatmap",
             };
 
@@ -188,8 +189,8 @@
             hex: hex,
             lat: lat,
             lon: lon,
-            speed: gs,
-            alt: alt,
+            alt: alt ?? null,
+            speed: gs ?? null,
             heading: null,
             source: "heatmap",
           });

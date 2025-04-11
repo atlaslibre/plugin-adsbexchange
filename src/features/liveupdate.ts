@@ -24,9 +24,9 @@ export const handleLiveUpdate = (msg: any) => {
     dataFrames.push({
       ts: Math.trunc(now - frame.seen_pos * 1000),
       hex: frame.hex,
-      squawk: frame.squawk,
-      flight: frame.flight,
-      reg: frame.r,
+      squawk: frame.squawk ?? null,
+      flight: frame.flight ?? null,
+      reg: frame.r ?? null,
       source: "live",
     });
 
@@ -35,9 +35,9 @@ export const handleLiveUpdate = (msg: any) => {
       hex: frame.hex,
       lat: frame.lat,
       lon: frame.lon,
-      alt: altitude,
-      speed: frame.gs,
-      heading: frame.true_heading ?? frame.track,
+      alt: altitude ?? null,
+      speed: frame.gs ?? null,
+      heading: frame.true_heading ?? frame.track ?? null,
       source: "live",
     });
   }

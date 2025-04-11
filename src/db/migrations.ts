@@ -25,10 +25,6 @@ export const PositionFrameCreateCommand = `
     );`;
 
 export const initDb = async (db: AsyncDuckDB) => {
-  await db.open({
-    path: "opfs://aircraft.db",
-    accessMode: DuckDBAccessMode.READ_WRITE,
-  });
   const conn = await db.connect();
   await conn.query(DataFrameCreateCommand);
   await conn.query(PositionFrameCreateCommand);
