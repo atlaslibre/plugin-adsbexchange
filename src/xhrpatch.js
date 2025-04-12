@@ -27,7 +27,7 @@
     for (let i = 0; i < o.trace.length; i++) {
       const t = o.trace[i];
 
-      const timestamp = Math.trunc((t[0] + baseTimestamp) * 1000);
+      const timestamp = Math.trunc(t[0] + baseTimestamp);
 
       const lat = t[1];
       const lon = t[2];
@@ -142,7 +142,7 @@
 
             let squawk = (lat & 0xffff).toString(10).padStart(4, "0");
             let data = {
-              ts: timestamp,
+              ts: timestamp / 1000,
               hex: hex,
               squawk: squawk,
               reg: null,
@@ -187,7 +187,7 @@
           else gs /= 10;
 
           positionUpdates.push({
-            ts: timestamp,
+            ts: timestamp / 1000,
             hex: hex,
             lat: lat,
             lon: lon,

@@ -42,7 +42,7 @@ chrome.runtime.onMessageExternal.addListener(function (
   if (msg.type === "query") {
     executeQuery<PositionQueryRow[]>(
       generatePositionQuery(
-        msg.ts * 1000,
+        msg.ts,
         msg.maxDelta,
         msg.bounds[0][1],
         msg.bounds[1][1],
@@ -60,7 +60,7 @@ chrome.runtime.onMessageExternal.addListener(function (
           ? executeQuery<TrackQueryRow[]>(
               generateTrackQuery(
                 hexs,
-                msg.ts * 1000,
+                msg.ts,
                 msg.maxDeltaTrack ?? msg.maxDelta
               )
             )

@@ -12,7 +12,7 @@ export const updateIcon = (active: boolean) => {
     const context = canvas.getContext("2d")!;
     context.drawImage(icon, 0, 0);
     context.font = "8px Arial";
-    context.fillText("🔴", 6, 14);
+    context.fillText("✈️", 6, 14);
     const imageData = context.getImageData(0, 0, 16, 16);
     chrome.action.setIcon({ imageData: imageData });
   } else {

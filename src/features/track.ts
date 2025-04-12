@@ -14,7 +14,7 @@ export interface TrackQueryRow {
 export function transformToTrack(rows: TrackQueryRow[]): ActorTrack {
   const pos = rows.map(
     (row): ActorPosition => ({
-      ts: Math.trunc(row.ts / 1000),
+      ts: row.ts,
       lat: row.lat,
       lon: row.lon,
       alt: row.alt !== undefined && row.alt < 0 ? 0 : row.alt, // todo convert ft

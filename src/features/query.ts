@@ -38,7 +38,7 @@ export function transformToActor(row: PositionQueryRow): AircraftActor {
     id: `adsbx-${row.hex}`,
     name: row.flight ?? row.reg ?? row.hex,
     pos: {
-      ts: Math.trunc(row.pts / 1000),
+      ts: row.pts,
       lat: row.lat,
       lon: row.lon,
       alt: row.alt !== undefined && row.alt < 0 ? 0 : row.alt, // todo convert ft

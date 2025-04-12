@@ -5,8 +5,8 @@ import { DataFrame, PositionFrame } from "./types";
 let lastLiveUpdate = 0;
 
 export const handleLiveUpdate = (msg: any) => {
-  const now = Date.now();
-  if (now - lastLiveUpdate < 3000) return;
+  const now = Date.now() / 1000;
+  if (now - lastLiveUpdate < 3) return;
 
   const dataFrames: DataFrame[] = [];
   const positionFrames: PositionFrame[] = [];
@@ -22,7 +22,7 @@ export const handleLiveUpdate = (msg: any) => {
     if (altitude === undefined) continue;
 
     dataFrames.push({
-      ts: Math.trunc(now - frame.seen_pos * 1000),
+      ts: Math.trunc(now - frame.seen_pos),
       hex: frame.hex,
       squawk: frame.squawk ?? null,
       flight: frame.flight ?? null,
@@ -31,7 +31,7 @@ export const handleLiveUpdate = (msg: any) => {
     });
 
     positionFrames.push({
-      ts: Math.trunc(now - frame.seen_pos * 1000),
+      ts: Math.trunc(now - frame.seen_pos),
       hex: frame.hex,
       lat: frame.lat,
       lon: frame.lon,
