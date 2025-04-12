@@ -27,6 +27,12 @@ interface AircraftActor {
 }
 
 export function transformToActor(row: PositionQueryRow): AircraftActor {
+  
+  row.flight = row.flight?.trim()
+
+  if(row.flight === "")
+    row.flight = undefined
+
   return {
     type: "aircraft",
     id: `adsbx-${row.hex}`,
