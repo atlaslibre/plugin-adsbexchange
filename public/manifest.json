@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "ADSB Exchange ↔ AtlasLibre",
   "description": "AtlasLibre Plugin for ADSB Exchange",
-  "version": "1.0",
+  "version": "1.0.1",
   "options_ui": {
     "page": "options.html"
   },
